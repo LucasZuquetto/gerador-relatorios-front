@@ -1,12 +1,28 @@
 import { useState } from "react";
 import "./App.css";
 import axios from "axios";
+import { Document, Page } from "react-pdf";
+import { pdfjs } from "react-pdf";
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+   "pdfjs-dist/build/pdf.worker.min.js",
+   import.meta.url
+).toString();
 
 function App() {
    const [inputValue, setInputValue] = useState();
+   const [pdfSource, setPdfSource] = useState();
+   const [numPages, setNumPages] = useState();
+   const [pageNumber, setPageNumber] = useState(1);
+
+   function onDocumentLoadSuccess({ numPages }) {
+      setNumPages(numPages);
+   }
+
    function handleChange(e) {
       setInputValue(e.target.value);
    }
+
    function handleSubmit(e) {
       e.preventDefault();
       const linhas = inputValue.trim().split("\n");
@@ -33,8 +49,7 @@ function App() {
             objetos.push(objeto);
          }
       });
-      console.log(objetos);
-      axios.post("http://localhost:3000/report", {
+      console.log({
          dados: objetos,
          header: {
             empresa: "RENATA CORTOPASSI",
@@ -43,14 +58,53 @@ function App() {
             divulgação: "13 a 17 NOV",
             publico: "CORRETORES DE GOIÂNIA/GO",
          },
-      }).then((response) => console.log(response))
+      });
+
+      axios
+         .post(
+            "http://localhost:3000/report",
+            {
+               dados: objetos,
+               header: {
+                  empresa: "RENATA CORTOPASSI",
+                  consultora: "MARCELA",
+                  contrato: "28/06/2023",
+                  divulgação: "13 a 17 NOV",
+                  publico: "CORRETORES DE GOIÂNIA/GO",
+               },
+            },
+            { responseType: "blob" }
+         )
+         .then((res) => {
+            console.log(res.data);
+
+            const file = new Blob([res.data], { type: "application/pdf" });
+            //Build a URL from the file
+            const fileURL = URL.createObjectURL(file);
+            //Open the URL on new Window
+            window.open(fileURL);
+         });
    }
 
    return (
-      <form onSubmit={handleSubmit}>
-         <textarea onChange={handleChange}></textarea>
-         <button type="submit">SUBMIT</button>
-      </form>
+      <>
+         <form onSubmit={handleSubmit}>
+            <textarea onChange={handleChange}></textarea>
+            <button type="submit">SUBMIT</button>
+         </form>
+         {/* {pdfSource ? (
+            <div>
+               <Document file={pdfSource} onLoadSuccess={onDocumentLoadSuccess}>
+                  <Page pageNumber={pageNumber} />
+               </Document>
+               <p>
+                  Page {pageNumber} of {numPages}
+               </p>
+            </div>
+         ) : (
+            ""
+         )} */}
+      </>
    );
 }
 
