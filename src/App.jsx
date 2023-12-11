@@ -1,40 +1,31 @@
 import { useState } from "react";
 import "./App.css";
 import axios from "axios";
-import { Document, Page } from "react-pdf";
-import { pdfjs } from "react-pdf";
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-   "pdfjs-dist/build/pdf.worker.min.js",
-   import.meta.url
-).toString();
 
 function App() {
-   const [inputValue, setInputValue] = useState();
-   const [pdfSource, setPdfSource] = useState();
-   const [numPages, setNumPages] = useState();
-   const [pageNumber, setPageNumber] = useState(1);
+   const [customersData, setCustomersData] = useState();
+   const [empresa, setEmpresa] = useState('');
+   const [consultora, setConsultora] = useState('');
+   const [contrato, setContrato] = useState('');
+   const [divulgação, setDivulgação] = useState('');
+   const [publico, setPublico] = useState('');
 
-   function onDocumentLoadSuccess({ numPages }) {
-      setNumPages(numPages);
-   }
-
-   function handleChange(e) {
-      setInputValue(e.target.value);
+   function handleChange(e, setValue) {
+      setValue(e.target.value);
    }
 
    function handleSubmit(e) {
       e.preventDefault();
-      const linhas = inputValue.trim().split("\n");
+      const linhas = customersData.trim().split("\n");
       const objetos = [];
       linhas.forEach(function (linha) {
          const colunas = linha.split("\t");
-         if (colunas[11] === "ENVIADO") {
+         if (colunas[colunas.length - 1] === "ENVIADO") {
             const objeto = {
                profissionais: colunas[0],
                endereço: colunas[2],
                site: colunas[3],
-               apresentamos: colunas[11],
+               apresentamos: colunas[colunas.length - 1],
                apresentamosNao: "",
             };
             objetos.push(objeto);
@@ -52,11 +43,11 @@ function App() {
       console.log({
          dados: objetos,
          header: {
-            empresa: "RENATA CORTOPASSI",
-            consultora: "MARCELA",
-            contrato: "28/06/2023",
-            divulgação: "13 a 17 NOV",
-            publico: "CORRETORES DE GOIÂNIA/GO",
+            empresa,
+            consultora,
+            contrato,
+            divulgação,
+            publico,
          },
       });
 
@@ -66,45 +57,73 @@ function App() {
             {
                dados: objetos,
                header: {
-                  empresa: "RENATA CORTOPASSI",
-                  consultora: "MARCELA",
-                  contrato: "28/06/2023",
-                  divulgação: "13 a 17 NOV",
-                  publico: "CORRETORES DE GOIÂNIA/GO",
+                  empresa,
+                  consultora,
+                  contrato,
+                  divulgação,
+                  publico,
                },
             },
             { responseType: "blob" }
          )
          .then((res) => {
             console.log(res.data);
-
             const file = new Blob([res.data], { type: "application/pdf" });
-            //Build a URL from the file
             const fileURL = URL.createObjectURL(file);
-            //Open the URL on new Window
             window.open(fileURL);
          });
    }
 
    return (
-      <>
-         <form onSubmit={handleSubmit}>
-            <textarea onChange={handleChange}></textarea>
-            <button type="submit">SUBMIT</button>
-         </form>
-         {/* {pdfSource ? (
+      <form onSubmit={handleSubmit}>
+         <div>
             <div>
-               <Document file={pdfSource} onLoadSuccess={onDocumentLoadSuccess}>
-                  <Page pageNumber={pageNumber} />
-               </Document>
-               <p>
-                  Page {pageNumber} of {numPages}
-               </p>
+               <label>EMPRESA</label>
+               <input
+                  onChange={(e) => handleChange(e, setEmpresa)}
+                  type="text"
+                  placeholder="EMPRESA"
+               />
             </div>
-         ) : (
-            ""
-         )} */}
-      </>
+            <div>
+               <label>CONSULTORA</label>
+               <input
+                  onChange={(e) => handleChange(e, setConsultora)}
+                  type="text"
+                  placeholder="CONSULTORA"
+               />
+            </div>
+            <div>
+               <label>CONTRATO</label>
+               <input
+                  onChange={(e) => handleChange(e, setContrato)}
+                  type="text"
+                  placeholder="CONTRATO"
+               />
+            </div>
+            <div>
+               <label>DIVULGAÇÃO</label>
+               <input
+                  onChange={(e) => handleChange(e, setDivulgação)}
+                  type="text"
+                  placeholder="DIVULGAÇÃO"
+               />
+            </div>
+            <div>
+               <label>PÚBLICO-ALVO</label>
+               <input
+                  onChange={(e) => handleChange(e, setPublico)}
+                  type="text"
+                  placeholder="PÚBLICO-ALVO"
+               />
+            </div>
+         </div>
+
+         <textarea
+            onChange={(e) => handleChange(e, setCustomersData)}
+         ></textarea>
+         <button type="submit">SUBMIT</button>
+      </form>
    );
 }
 
