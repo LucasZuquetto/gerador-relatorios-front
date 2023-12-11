@@ -3,7 +3,7 @@ import "./App.css";
 import axios from "axios";
 
 function App() {
-   const [customersData, setCustomersData] = useState();
+   const [customersData, setCustomersData] = useState('');
    const [empresa, setEmpresa] = useState('');
    const [consultora, setConsultora] = useState('');
    const [contrato, setContrato] = useState('');
@@ -53,7 +53,7 @@ function App() {
 
       axios
          .post(
-            "http://localhost:3000/report",
+            "https://gerador-relatorios-back.onrender.com/report",
             {
                dados: objetos,
                header: {
@@ -122,7 +122,7 @@ function App() {
          <textarea
             onChange={(e) => handleChange(e, setCustomersData)}
          ></textarea>
-         <button type="submit">SUBMIT</button>
+         <button type="submit">GERAR RELATÓRIO</button>
       </form>
    );
 }
