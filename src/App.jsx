@@ -2,6 +2,9 @@ import { useState } from "react";
 import "./App.css";
 import axios from "axios";
 
+// const url = "http://localhost:3000"
+const url = "https://gerador-relatorios-back.onrender.com"
+
 function App() {
    const [customersData, setCustomersData] = useState('');
    const [empresa, setEmpresa] = useState('');
@@ -25,7 +28,7 @@ function App() {
                profissionais: colunas[0],
                endereço: colunas[2],
                site: colunas[3],
-               apresentamos: colunas[colunas.length - 1],
+               apresentamos: "S",
                apresentamosNao: "",
             };
             objetos.push(objeto);
@@ -53,7 +56,7 @@ function App() {
 
       axios
          .post(
-            "https://gerador-relatorios-back.onrender.com/report",
+            `${url}/report`,
             {
                dados: objetos,
                header: {
