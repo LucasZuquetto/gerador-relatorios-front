@@ -46,7 +46,7 @@ function App() {
                };
                objetos.push(objeto);
             } else {
-               setError("O texto possui alguma linha sem o status de envio");
+               setError("Texto no formato incorreto");
                throw "status de envio incorreto";
             }
          });
