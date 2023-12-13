@@ -28,3 +28,11 @@ div > div{
 label{
   width: 110px;
 }
+span{
+  color: red;
+  font-weight: bold;
+  background-color: azure;
+  padding: 5px;
+  margin-top: 5px;
+  border-radius: 4px;
+}

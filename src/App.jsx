@@ -2,16 +2,18 @@ import { useState } from "react";
 import "./App.css";
 import axios from "axios";
 
-// const url = "http://localhost:3000"
+// const url = "http://localhost:3000";
 const url = "https://gerador-relatorios-back.onrender.com"
 
 function App() {
-   const [customersData, setCustomersData] = useState('');
-   const [empresa, setEmpresa] = useState('');
-   const [consultora, setConsultora] = useState('');
-   const [contrato, setContrato] = useState('');
-   const [divulgação, setDivulgação] = useState('');
-   const [publico, setPublico] = useState('');
+   const [error, setError] = useState("");
+   const [isLoading, setIsLoading] = useState(false);
+   const [customersData, setCustomersData] = useState("");
+   const [empresa, setEmpresa] = useState("");
+   const [consultora, setConsultora] = useState("");
+   const [contrato, setContrato] = useState("");
+   const [divulgação, setDivulgação] = useState("");
+   const [publico, setPublico] = useState("");
 
    function handleChange(e, setValue) {
       setValue(e.target.value);
@@ -19,30 +21,41 @@ function App() {
 
    function handleSubmit(e) {
       e.preventDefault();
-      const linhas = customersData.trim().split("\n");
       const objetos = [];
-      linhas.forEach(function (linha) {
-         const colunas = linha.split("\t");
-         if (colunas[colunas.length - 1] === "ENVIADO") {
-            const objeto = {
-               profissionais: colunas[0],
-               endereço: colunas[2],
-               site: colunas[3],
-               apresentamos: "S",
-               apresentamosNao: "",
-            };
-            objetos.push(objeto);
-         } else {
-            const objeto = {
-               profissionais: colunas[0],
-               endereço: colunas[2],
-               site: colunas[3],
-               apresentamos: "",
-               apresentamosNao: "EM ANDAMENTO",
-            };
-            objetos.push(objeto);
-         }
-      });
+      try {
+         setIsLoading(true);
+         const linhas = customersData.trim().split("\n");
+         linhas.forEach(function (linha) {
+            const colunas = linha.split("\t");
+            if (colunas[colunas.length - 1] === "ENVIADO") {
+               const objeto = {
+                  profissionais: colunas[0],
+                  endereço: colunas[2],
+                  site: colunas[3],
+                  apresentamos: "S",
+                  apresentamosNao: "",
+               };
+               objetos.push(objeto);
+            } else if (colunas[colunas.length - 1] === "INVÁLIDO") {
+               const objeto = {
+                  profissionais: colunas[0],
+                  endereço: colunas[2],
+                  site: colunas[3],
+                  apresentamos: "",
+                  apresentamosNao: "EM ANDAMENTO",
+               };
+               objetos.push(objeto);
+            } else {
+               setError("O texto possui alguma linha sem o status de envio");
+               throw "status de envio incorreto";
+            }
+         });
+      } catch (error) {
+         setIsLoading(false);
+         console.log(error);
+         return;
+      }
+
       console.log({
          dados: objetos,
          header: {
@@ -71,10 +84,16 @@ function App() {
          )
          .then((res) => {
             console.log(res.data);
+            setError("");
             const file = new Blob([res.data], { type: "application/pdf" });
             const fileURL = URL.createObjectURL(file);
             window.open(fileURL);
-         });
+         })
+         .catch((err) => {
+            console.error(err?.response?.statusText);
+            setError(err?.response?.statusText);
+         })
+         .finally(() => setIsLoading(false));
    }
 
    return (
@@ -86,6 +105,7 @@ function App() {
                   onChange={(e) => handleChange(e, setEmpresa)}
                   type="text"
                   placeholder="EMPRESA"
+                  maxLength={45}
                />
             </div>
             <div>
@@ -94,6 +114,7 @@ function App() {
                   onChange={(e) => handleChange(e, setConsultora)}
                   type="text"
                   placeholder="CONSULTORA"
+                  maxLength={40}
                />
             </div>
             <div>
@@ -102,6 +123,7 @@ function App() {
                   onChange={(e) => handleChange(e, setContrato)}
                   type="text"
                   placeholder="CONTRATO"
+                  maxLength={40}
                />
             </div>
             <div>
@@ -110,6 +132,7 @@ function App() {
                   onChange={(e) => handleChange(e, setDivulgação)}
                   type="text"
                   placeholder="DIVULGAÇÃO"
+                  maxLength={34}
                />
             </div>
             <div>
@@ -118,6 +141,7 @@ function App() {
                   onChange={(e) => handleChange(e, setPublico)}
                   type="text"
                   placeholder="PÚBLICO-ALVO"
+                  maxLength={100}
                />
             </div>
          </div>
@@ -125,7 +149,16 @@ function App() {
          <textarea
             onChange={(e) => handleChange(e, setCustomersData)}
          ></textarea>
-         <button type="submit">GERAR RELATÓRIO</button>
+         <button disabled={isLoading ? true : false} type="submit">
+            {isLoading ? "CARREGANDO..." : "GERAR RELATÓRIO"}
+         </button>
+         <span hidden={error === "" ? true : false}>
+            {error === "Payload Too Large"
+               ? "Relatório muito grande"
+               : error === "Unprocessable Entity"
+               ? "Texto no formato incorreto"
+               : error}
+         </span>
       </form>
    );
 }
