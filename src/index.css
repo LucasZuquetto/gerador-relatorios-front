@@ -57,4 +57,9 @@ button {
 button:hover {
   border-color: #646cff;
 }
-
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  color: #666666;
+  cursor: initial;
+}

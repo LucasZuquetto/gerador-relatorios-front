@@ -1,19 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import axios from "axios";
 
 // const url = "http://localhost:3000";
-const url = "https://gerador-relatorios-back.onrender.com"
+const url = "https://gerador-relatorios-back.onrender.com";
 
 function App() {
    const [error, setError] = useState("");
-   const [isLoading, setIsLoading] = useState(false);
+   const [isLoading, setIsLoading] = useState(true);
    const [customersData, setCustomersData] = useState("");
    const [empresa, setEmpresa] = useState("");
    const [consultora, setConsultora] = useState("");
    const [contrato, setContrato] = useState("");
    const [divulgação, setDivulgação] = useState("");
    const [publico, setPublico] = useState("");
+
+   useEffect(() => {
+      axios
+         .get(`${url}/health`)
+         .then((res) => {
+            console.log(res.data);
+            setIsLoading(false);
+         })
+         .catch((err) => {
+            console.error(err?.response?.statusText);
+            setIsLoading(true);
+         });
+   }, []);
 
    function handleChange(e, setValue) {
       setValue(e.target.value);
@@ -149,7 +162,7 @@ function App() {
          <textarea
             onChange={(e) => handleChange(e, setCustomersData)}
          ></textarea>
-         <button disabled={isLoading ? true : false} type="submit">
+         <button disabled={isLoading} type="submit">
             {isLoading ? "CARREGANDO..." : "GERAR RELATÓRIO"}
          </button>
          <span hidden={error === "" ? true : false}>
