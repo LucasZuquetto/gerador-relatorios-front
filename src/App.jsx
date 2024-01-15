@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import axios from "axios";
 
-// const url = "http://localhost:3000";
-const url = "https://gerador-relatorios-back.onrender.com";
+const url = "http://localhost:3000";
+// const url = "https://gerador-relatorios-back.onrender.com";
 
 function App() {
    const [error, setError] = useState("");
@@ -49,7 +49,17 @@ function App() {
                   apresentamosNao: "",
                };
                objetos.push(objeto);
-            } else if (colunas[colunas.length - 1] === "INVÁLIDO") {
+            } else {
+               if (colunas[colunas.length - 1] === "INVÁLIDO") {
+                  return;
+               }
+               setError("Texto no formato incorreto");
+               throw "status de envio incorreto";
+            }
+         });
+         linhas.forEach(function (linha) {
+            const colunas = linha.split("\t");
+            if (colunas[colunas.length - 1] === "INVÁLIDO") {
                const objeto = {
                   profissionais: colunas[0],
                   endereço: colunas[2],
@@ -59,6 +69,9 @@ function App() {
                };
                objetos.push(objeto);
             } else {
+               if (colunas[colunas.length - 1] === "ENVIADO") {
+                  return;
+               }
                setError("Texto no formato incorreto");
                throw "status de envio incorreto";
             }
