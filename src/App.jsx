@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import axios from "axios";
 
-const url = "http://localhost:3000";
-// const url = "https://gerador-relatorios-back.onrender.com";
+// const url = "http://localhost:3000";
+const url = "https://gerador-relatorios-back.onrender.com";
 
 function App() {
    const [error, setError] = useState("");
