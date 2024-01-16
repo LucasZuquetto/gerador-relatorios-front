@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import axios from "axios";
+import dayjs from "dayjs"
 
 // const url = "http://localhost:3000";
 const url = "https://gerador-relatorios-back.onrender.com";
 
 function App() {
+   const mondayDateCurrentWeek = dayjs().subtract(dayjs().day() - 1,"days").format("DD/MM")
+   const fridayDateCurrentWeek = dayjs().add(5 - dayjs().day(),"days").format("DD/MM")
    const [error, setError] = useState("");
    const [isLoading, setIsLoading] = useState(true);
    const [customersData, setCustomersData] = useState("");
    const [empresa, setEmpresa] = useState("");
    const [consultora, setConsultora] = useState("");
    const [contrato, setContrato] = useState("");
-   const [divulgação, setDivulgação] = useState("");
+   const [divulgação, setDivulgação] = useState(`${mondayDateCurrentWeek} a ${fridayDateCurrentWeek}`);
    const [publico, setPublico] = useState("");
 
    useEffect(() => {
@@ -152,15 +155,16 @@ function App() {
                   maxLength={40}
                />
             </div>
-            <div>
+            {/* <div>
                <label>DIVULGAÇÃO</label>
                <input
                   onChange={(e) => handleChange(e, setDivulgação)}
                   type="text"
                   placeholder="DIVULGAÇÃO"
                   maxLength={34}
+                  value={divulgação}
                />
-            </div>
+            </div> */}
             <div>
                <label>PÚBLICO-ALVO</label>
                <input

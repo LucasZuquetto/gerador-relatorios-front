@@ -1,5 +1,5 @@
 {
-  "homepage":"https://LucasZuquetto.github.io/gerador-relatorios-front",
+  "homepage": "https://LucasZuquetto.github.io/gerador-relatorios-front",
   "name": "gerar-pdf-front",
   "private": true,
   "version": "0.0.0",
@@ -9,11 +9,12 @@
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "predeploy":"npm run build",
-    "deploy":"gh-pages -d dist"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "axios": "^1.6.2",
+    "dayjs": "^1.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-pdf": "^7.6.0"
